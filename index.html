@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width,initial-scale=1'>
+<title>led2d games</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Inter,Arial,sans-serif;color:#fff;background:#0b1120;overflow:hidden}body:before{content:'';position:fixed;inset:-20%;background:radial-gradient(circle at 20% 20%,#1e293b,transparent 25%),radial-gradient(circle at 80% 30%,#334155,transparent 25%),radial-gradient(circle at 50% 80%,#111827,transparent 35%),linear-gradient(140deg,#020617,#0f172a,#111827);filter:blur(70px);animation:bg 18s ease-in-out infinite;z-index:-1}@keyframes bg{50%{transform:scale(1.08) translate(-3%,2%)}}header{display:flex;justify-content:space-between;align-items:center;padding:16px}.logo,.theme{width:46px;height:46px;border:none;border-radius:14px;background:#ffffff12 center/cover no-repeat}.wrap{height:calc(100vh - 78px);overflow:auto;padding:0 16px 24px}.search{width:240px;padding:13px 16px;border-radius:18px;border:1px solid #ffffff18;background:#ffffff10;color:#fff;outline:none;transition:.25s}.search:focus{width:330px}.sec{margin:18px 0 10px;font-weight:800}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(138px,1fr));gap:14px}.card{padding:10px;border-radius:24px;background:#ffffff10;cursor:pointer;transition:.2s}.card:hover{transform:translateY(-6px)}.thumb{aspect-ratio:1/1;border-radius:20px;background:center/cover no-repeat}.carousel{height:220px;overflow:hidden}.track{display:flex;gap:14px;width:max-content;animation:slide 28s linear infinite}.carousel:hover .track{animation-play-state:paused}@keyframes slide{100%{transform:translateX(-50%)}}.hero{min-width:420px;height:220px;border-radius:28px;background:center/cover no-repeat;cursor:pointer}.ov,.pv{position:fixed;inset:0;display:none}.show{display:block}.page{position:absolute;inset:0;background:center/cover no-repeat}.fade{position:absolute;inset:0;background:linear-gradient(to top,#000d,#0007 25%,#0000 60%)}.topb{position:absolute;top:16px;right:16px;width:46px;height:46px;border:none;border-radius:14px;background:#0008}.topb img{width:22px;height:22px}.pane{position:absolute;left:24px;bottom:24px}.big{width:118px;height:118px;border-radius:28px;background:center/cover no-repeat;margin-bottom:14px}.row{display:flex;gap:12px}.play{width:220px;height:58px;border:none;border-radius:18px;background:#22c55e;color:#fff;font-size:24px;font-weight:900}.heart{width:58px;height:58px;border:none;border-radius:18px;background:#ffffff18;color:#fff;font-size:28px}.heart.on{color:#ff3355}.pv iframe{width:100%;height:100%;border:none}.dock{position:absolute;right:14px;bottom:14px;background:#ffffff22;backdrop-filter:blur(8px);padding:8px;border-radius:18px;display:flex;gap:8px}.dock button{width:44px;height:44px;border:none;border-radius:14px;background:#d1d5db55;border:1px solid #ffffff22}.dock img{width:20px;height:20px}
+</style>
+</head>
+<body>
+<header>
+<div style='display:flex;align-items:center;gap:12px'>
+<button class='logo' id='logo'></button>
+<div style="font-size:28px;font-weight:900;letter-spacing:.5px;font-family:Impact,Haettenschweiler,'Arial Black',sans-serif;text-shadow:0 4px 18px #0008">led2d games</div>
+</div>
+<button class='theme' id='theme'></button>
+</header>
+<div class='wrap'>
+<input class='search' placeholder='Search' oninput='render(this.value)'>
+<div class='sec'>Favourited Games</div>
+<div class='grid' id='fav'></div>
+<div class='sec'>Featured</div>
+<div class='carousel'><div class='track' id='track'></div></div>
+<div class='sec'>All Games</div>
+<div class='grid' id='all'></div>
+</div>
+<div class='ov' id='ov'>
+<div class='page' id='page'>
+<div class='fade'></div>
+<button class='topb' onclick='closePreview()'><img src='preview_back.svg'></button>
+<div class='pane'>
+<div class='big' id='big'></div>
+<div class='row'>
+<button class='play' onclick='playGame()'>▶</button>
+<button class='heart' id='heart' onclick='toggleFav()'>♡</button>
+</div>
+</div>
+</div>
+</div>
+<div class='pv' id='pv'>
+<iframe id='frame'></iframe>
+<div class='dock' id='dock'>
+<button onclick='leaveGame()'><img src='ingame_back.svg'></button>
+<button onclick='full()'><img src='fullscreen.svg'></button>
+</div>
+</div>
+<script>
+const TEST_MODE=true;
+const TEST_IMG='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRr_-62a40u3lSIyRP5EKOjJeQiZROwTeVCOQ&s';
+const games=[
+{name:'Minecraft',file:'Files/Minecraft/index.html',icon:'Game_Images/Minecraft.png',bg:'Game_Images/MinecraftFull.png'},
+{name:'Game Two',file:'Files/game2/index.html',icon:'Game_Images/game2_icon.jpg',bg:'Game_Images/game2_bg.gif'},
+{name:'Game Three',file:'Files/game3/index.html',icon:'Game_Images/game3_icon.jpg',bg:'Game_Images/game3_bg.jpg'}
+];
+let current=0;
+function img(u){return TEST_MODE?TEST_IMG:u}
+function favs(){return JSON.parse(localStorage.favs||'[]')}
+function save(v){localStorage.favs=JSON.stringify(v)}
+function toggleFav(){let f=favs();f.includes(current)?f=f.filter(x=>x!==current):f.push(current);save(f);updateHeart();render()}
+function updateHeart(){heart.className='heart'+(favs().includes(current)?' on':'')}
+function card(g,i){return `<div class='card' onclick='openPreview(${i})'><div class='thumb' style="background-image:url(${img(g.icon)})"></div></div>`}
+function render(q=''){logo.style.backgroundImage=`url(${img('siteicon.png')})`;theme.style.backgroundImage=`url(${img('themeicon.svg')})`;q=q.toLowerCase();all.innerHTML='';fav.innerHTML='';track.innerHTML='';games.forEach((g,i)=>{if(g.name.toLowerCase().includes(q)){all.innerHTML+=card(g,i);if(favs().includes(i))fav.innerHTML+=card(g,i)}track.innerHTML+=`<div class='hero' onclick='openPreview(${i})' style="background-image:url(${img(g.bg)})"></div>`});track.innerHTML+=track.innerHTML;if(!fav.innerHTML)fav.innerHTML='<div style="opacity:.6">None</div>'}
+function openPreview(i){current=i;page.style.backgroundImage=`url(${img(games[i].bg)})`;big.style.backgroundImage=`url(${img(games[i].icon)})`;ov.classList.add('show');updateHeart()}
+function closePreview(){ov.classList.remove('show')}
+function playGame(){frame.src=games[current].file;pv.classList.add('show');ov.classList.remove('show')}
+function leaveGame(){pv.classList.remove('show');frame.src='';openPreview(current)}
+function full(){document.documentElement.requestFullscreen();dock.style.display='none'}
+document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement)dock.style.display='flex'})
+render();
+</script>
+</body>
+</html>
